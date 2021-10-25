@@ -331,13 +331,13 @@ class Initializer:
     def getParticleTemp2Load(self):
         return self.temp2load
 
-    def getParticleFluidVelX2Load(self):
+    def getParticleFluidVelX2Load(self,x,y,z):
         return self.fluidVel2sustain[0]
 
-    def getParticleFluidVelY2Load(self):
+    def getParticleFluidVelY2Load(self,x,y,z):
         return self.fluidVel2sustain[1]
 
-    def getParticleFluidVelZ2Load(self):
+    def getParticleFluidVelZ2Load(self,x,y,z):
         return self.fluidVel2sustain[2]
 
     def getPressureIncreaseRate(self):

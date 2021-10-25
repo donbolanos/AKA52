@@ -452,7 +452,7 @@ void ModelInitializer::initParticles(){
     vector<double> vel;
     vector<double> fluidVel;
     double r1, r2;
-
+    double loadVth;
 
     if( totParticleNumberInDomain <= 0 ){
         throw runtime_error("Check initialization, particles number in domain = "
@@ -479,6 +479,7 @@ void ModelInitializer::initParticles(){
             int type2load = loader->prtclType2Load;
             double loadMass = pusher->getParticleMass4Type(type2load);
             double loadCharge = pusher->getParticleCharge4Type(type2load);
+            loadVth  = sqrt(loader->prtclTemp2Load/loadMass);
             // last element is reserved for loaded particles
             pusher->setParticleMass4Type(spn, loadMass);
             pusher->setParticleCharge4Type(spn, loadCharge);
@@ -549,8 +550,15 @@ void ModelInitializer::initParticles(){
 
                         pusher->setParticleType(particle_idx,  spn);
 
-                        vel = loader->getVelocity(pos[0], pos[1], pos[2], spn);
-                        fluidVel = loader->getFluidVelocity(pos[0], pos[1], pos[2], spn);
+                        if ( (loader->numOfSpots > 0) && (spn == (numOfSpecies-1)) ) {
+                          vel[0] = loadVth;
+                          vel[1] = loadVth;
+                          vel[2] = loadVth;
+                          fluidVel = loader->getFluidVelocity2Load(pos[0], pos[1], pos[2]);
+                        }else{
+                          vel = loader->getVelocity(pos[0], pos[1], pos[2], spn);
+                          fluidVel = loader->getFluidVelocity(pos[0], pos[1], pos[2], spn);
+                        }
 
                         r1 = RNM;
                         r2 = RNM;

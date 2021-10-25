@@ -159,7 +159,6 @@ void LaserMockManager::addIons(){
                     pos[2] += domainShiftZ;
 
                     fluidVel = loader->getFluidVelocity2Load(pos[0], pos[1], pos[2]);
-
                     double pos2Save[6] = {pos[0], pos[1], pos[2],
                                           pos[0], pos[1], pos[2]};
 
@@ -183,7 +182,6 @@ void LaserMockManager::addIons(){
                     r1   = (r1 > EPS8)? r1 : r1 + EPS8;
                     r2   = (r2 > EPS8)? r2 : r2 + EPS8;
                     vpb[2] = sqrt(-2*log(r1))*vel[2] * cos(2*PI*r2) + fluidVel[2];
-
 
                     double vel2Save[6] = {vpb[0], vpb[1], vpb[2],
                                           vpb[0], vpb[1], vpb[2]};
