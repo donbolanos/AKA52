@@ -508,7 +508,7 @@ void ModelInitializer::initParticles(){
             for( k = 0; k < zRes; k++){
 
                 idxOnG2 = IDX(i+1, j+1, k+1, xRes+2, yRes+2, zRes+2);
-
+                idx = IDX(i, j, k, xRes, yRes, zRes);
                 for( spn = 0; spn < numOfSpecies; spn++ ){
 
                     requiredPrtclNum = int(dens[spn][idxOnG2]->getValue()[0]/

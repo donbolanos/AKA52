@@ -18,6 +18,7 @@ LaserMockManager::LaserMockManager(std::shared_ptr<Loader> ldr,
 LaserMockManager::~LaserMockManager(){
     delete[] electronPressureProfile;
     delete[] targetIonDensityProfile;
+    delete[] fluidVelocity2Load;
 }
 
 
@@ -36,6 +37,9 @@ void LaserMockManager::initialize(){
 
     electronPressureProfile = new double[nG2*sizeof(double)];
     targetIonDensityProfile = new double[nG2*sizeof(double)];
+    fluidVelocity2Load = new double[xRes*yRes*zRes*3*sizeof(double)];
+
+    vector<double> fluidVel;
 
     double pres, dens;
 
@@ -53,6 +57,8 @@ void LaserMockManager::initialize(){
     double G2shift = -0.5;// symmetry requirement
     double x,y,z;
     int i,j,k;
+
+    //instantiate Electron Pressure and Ion density profiel on the GRID 2
     for( i = 0; i < xRes+1; i++){
         for( j = 0; j < yRes+1; j++) {
             for( k = 0; k < zRes+1; k++){
@@ -72,6 +78,26 @@ void LaserMockManager::initialize(){
                 dens = loader->getTargetIonDensityProfile(x,y,z);
 
                 targetIonDensityProfile[idxOnG2] = dens;
+
+            }
+        }
+    }
+    //instantiate Fluid Velocity on GRID 1
+    for ( i=0; i<xRes; i++){
+        for ( j=0; j<yRes; j++){
+            for ( k=0; k<zRes; k++){
+                idx = IDX(i,j,k,xRes,yRes,zRes);
+
+                x = i*dx + domainShiftX;
+                y = j*dy + domainShiftY;
+                z = k*dz + domainShiftZ;
+
+                fluidVel = loader->getFluidVelocity2Load(x, y, z);
+                for( int n = 0; n < 3; n++ ){
+
+                    fluidVelocity2Load[3*idx+n] = fluidVel[n];
+
+                }
 
             }
         }
@@ -110,8 +136,7 @@ void LaserMockManager::addIons(){
     double vel[3] = {vth, vth, vth};
     double vpb[3] = {0.0, 0.0, 0.0};
     double pos[3] = {0.0, 0.0, 0.0};
-
-    vector<double> fluidVel;
+    double fluidVel[3];
 
     int ptclIDX;
 
@@ -119,7 +144,7 @@ void LaserMockManager::addIons(){
     vector<shared_ptr<Particle>> particles2add;
     int particle_idx = 0;
     double r1, r2;
-    int idxOnG2;
+    int idxOnG2, idx;
     int requiredPrtclNum;
 
     for( i = 0; i < xRes; i++){
@@ -127,6 +152,11 @@ void LaserMockManager::addIons(){
             for( k = 0; k < zRes; k++){
 
                 idxOnG2 = IDX(i+1, j+1, k+1, xResG2, yResG2, zResG2);
+                idx = IDX(i, j, k, xRes, yRes, zRes);
+
+                for( int n = 0; n < 3; n++ ){
+                    fluidVel[n] = fluidVelocity2Load[3*idx+n];
+                }
 
                 double desireDens =
                 targetIonDensityProfile[idxOnG2] - dens[idxOnG2]->getValue()[0];
@@ -158,7 +188,6 @@ void LaserMockManager::addIons(){
                     pos[1] += domainShiftY;
                     pos[2] += domainShiftZ;
 
-                    fluidVel = loader->getFluidVelocity2Load(pos[0], pos[1], pos[2]);
                     double pos2Save[6] = {pos[0], pos[1], pos[2],
                                           pos[0], pos[1], pos[2]};
 

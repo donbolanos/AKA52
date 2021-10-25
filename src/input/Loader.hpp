@@ -94,7 +94,7 @@ public:
     double pressureIncreaseRate;
     int laserPulseDuration_tsnum;
     double loadedEnergyPerStep = 0.0;
-
+  
     //MPI staff
     std::vector<int> neighbors2Send;//27
     std::vector<int> neighbors2Recv;//27
